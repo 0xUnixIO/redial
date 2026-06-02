@@ -26,6 +26,10 @@ pub async fn run(config: Config) -> anyhow::Result<()> {
         .ok_or_else(|| anyhow::anyhow!("未配置 TG_TOKEN，请运行 redial setup"))?;
 
     let bot = Bot::new(token);
+
+    // 注册命令菜单，输入 / 时显示
+    bot.set_my_commands(Command::bot_commands()).await?;
+
     let config = Arc::new(config);
 
     let handler = dptree::entry()

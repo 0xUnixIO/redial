@@ -126,6 +126,27 @@ async fn run_daemon(config: config::Config) -> anyhow::Result<()> {
     Ok(())
 }
 
+fn interactive_timer(config: &config::Config) -> anyhow::Result<()> {
+    use dialoguer::Input;
+
+    let current = config.change_cron.as_deref().unwrap_or("未启用");
+    println!("⏰ 当前定时换 IP: {current}");
+    println!("  输入 cron 表达式设置定时（如 0 */6 * * *），输入 off 关闭，直接回车取消");
+
+    let input: String = Input::new()
+        .with_prompt("定时设置")
+        .allow_empty(true)
+        .interact_text()?;
+
+    let trimmed = input.trim();
+    if trimmed.is_empty() {
+        println!("已取消");
+    } else {
+        cli::cmd_timer(config, trimmed)?;
+    }
+    Ok(())
+}
+
 async fn interactive_menu(config: &config::Config) -> anyhow::Result<()> {
     let items = vec![
         "📡  status   查看当前 IP",
@@ -147,7 +168,7 @@ async fn interactive_menu(config: &config::Config) -> anyhow::Result<()> {
             0 => cli::cmd_status(config).await?,
             1 => cli::cmd_check(config).await?,
             2 => cli::cmd_change(config).await?,
-            3 => cli::cmd_timer(config, "")?,
+            3 => interactive_timer(config)?,
             4 => {
                 config::run_setup_wizard().await?;
                 break;

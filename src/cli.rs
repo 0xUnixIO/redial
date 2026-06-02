@@ -36,13 +36,41 @@ pub async fn cmd_check(config: &Config) -> anyhow::Result<()> {
         println!();
     }
 
-    println!("📺 流媒体检测中...");
-    let results = crate::streaming::check_all().await;
-    for r in &results {
-        println!("   {:16} {}", r.service, r.status.display());
+    // 流媒体检测需要从 Boil VPS 的 IP 发出，先对比本机公网 IP
+    let boil_ips: Vec<String> = data.changeable()
+        .iter()
+        .filter_map(|r| data.get_ip(&r.router_id, &r.interface))
+        .map(str::to_string)
+        .collect();
+
+    let local_ip = get_local_public_ip().await;
+    let on_boil_vps = local_ip.as_deref().map(|ip| boil_ips.iter().any(|b| b == ip)).unwrap_or(false);
+
+    if on_boil_vps {
+        println!("📺 流媒体检测中...");
+        let results = crate::streaming::check_all().await;
+        for r in &results {
+            println!("   {:16} {}", r.service, r.status.display());
+        }
+    } else {
+        println!("📺 流媒体检测跳过（当前运行于非 Boil VPS 机器，结果无意义）");
+        println!("   如需检测，请在 Boil VPS 上直接运行 boil check");
     }
     println!();
     Ok(())
+}
+
+async fn get_local_public_ip() -> Option<String> {
+    reqwest::Client::new()
+        .get("https://api.ipify.org")
+        .timeout(std::time::Duration::from_secs(5))
+        .send()
+        .await
+        .ok()?
+        .text()
+        .await
+        .ok()
+        .map(|s| s.trim().to_string())
 }
 
 pub async fn cmd_change(config: &Config) -> anyhow::Result<()> {

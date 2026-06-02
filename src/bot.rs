@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
 use teloxide::{
     prelude::*,
@@ -192,17 +192,30 @@ async fn tg_check(bot: &Bot, chat_id: ChatId, config: &Config) {
         }
     }
 
-    // 流媒体检测
-    let streaming = crate::streaming::check_all().await;
-    let streaming_lines: Vec<String> = streaming
+    // 流媒体检测：仅在本机 IP 与 Boil VPS IP 一致时才有意义
+    let boil_ips: Vec<String> = data.changeable()
         .iter()
-        .map(|r| format!("  {:16} {}", r.service, r.status.display()))
+        .filter_map(|r| data.get_ip(&r.router_id, &r.interface))
+        .map(str::to_string)
         .collect();
+    let local_ip = get_local_public_ip().await;
+    let on_boil_vps = local_ip.as_deref()
+        .map(|ip| boil_ips.iter().any(|b| b == ip))
+        .unwrap_or(false);
 
-    lines.push(format!(
-        "\n📺 <b>流媒体解锁</b>\n<pre>{}</pre>",
-        streaming_lines.join("\n")
-    ));
+    if on_boil_vps {
+        let streaming = crate::streaming::check_all().await;
+        let streaming_lines: Vec<String> = streaming
+            .iter()
+            .map(|r| format!("  {:16} {}", r.service, r.status.display()))
+            .collect();
+        lines.push(format!(
+            "\n📺 <b>流媒体解锁</b>\n<pre>{}</pre>",
+            streaming_lines.join("\n")
+        ));
+    } else {
+        lines.push("\n📺 <b>流媒体检测</b>\n运行于非 Boil VPS，跳过（结果无意义）".to_string());
+    }
 
     let _ = bot
         .send_message(chat_id, lines.join("\n\n"))
@@ -341,4 +354,17 @@ async fn tg_do_reconnect(
             let _ = bot.send_message(chat_id, format!("❌ 换 IP 失败: {e}")).await;
         }
     }
+}
+
+async fn get_local_public_ip() -> Option<String> {
+    reqwest::Client::new()
+        .get("https://api.ipify.org")
+        .timeout(Duration::from_secs(5))
+        .send()
+        .await
+        .ok()?
+        .text()
+        .await
+        .ok()
+        .map(|s| s.trim().to_string())
 }

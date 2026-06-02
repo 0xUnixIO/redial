@@ -1,0 +1,12 @@
+# 真实配置(含账号密码),绝不提交
+config.env
+
+# 运行期临时文件
+cookies.txt
+*.cookie
+bot.log
+
+
+# Added by cargo
+
+/target

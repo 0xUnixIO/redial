@@ -31,7 +31,7 @@ pub async fn run(config: Config) -> anyhow::Result<()> {
     let token = config
         .tg_token
         .as_deref()
-        .ok_or_else(|| anyhow::anyhow!("未配置 TG_TOKEN，请运行 redial setup"))?;
+        .ok_or_else(|| anyhow::anyhow!("未配置 TG_TOKEN，请运行 boil setup"))?;
 
     let bot = Bot::new(token);
     bot.set_my_commands(Command::bot_commands()).await?;
@@ -236,7 +236,7 @@ async fn tg_timer(bot: &Bot, chat_id: ChatId, config: &Config, arg: &str) {
             Ok(_) => {
                 let _ = bot.send_message(
                     chat_id,
-                    format!("✅ 定时换 IP 已设置: <code>{arg}</code>\n重启 redial 后生效"),
+                    format!("✅ 定时换 IP 已设置: <code>{arg}</code>\n重启 boil 后生效"),
                 )
                 .parse_mode(ParseMode::Html)
                 .await;

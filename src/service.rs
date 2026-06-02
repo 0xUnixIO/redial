@@ -1,8 +1,8 @@
 use std::{fs, path::Path, process::Command};
 
-const SERVICE_NAME: &str = "redial";
-const SERVICE_PATH: &str = "/etc/systemd/system/redial.service";
-const CONFIG_DIR: &str = "/etc/redial";
+const SERVICE_NAME: &str = "boil";
+const SERVICE_PATH: &str = "/etc/systemd/system/boil.service";
+const CONFIG_DIR: &str = "/etc/boil";
 
 pub fn install() -> anyhow::Result<()> {
     let exe = std::env::current_exe()?;
@@ -12,14 +12,14 @@ pub fn install() -> anyhow::Result<()> {
     fs::create_dir_all(CONFIG_DIR)?;
 
     // 如果当前目录有 config.env，复制过去
-    if Path::new("config.env").exists() && !Path::new("/etc/redial/config.env").exists() {
-        fs::copy("config.env", "/etc/redial/config.env")?;
+    if Path::new("config.env").exists() && !Path::new("/etc/boil/config.env").exists() {
+        fs::copy("config.env", "/etc/boil/config.env")?;
         println!("✅ 已复制 config.env 到 {CONFIG_DIR}/config.env");
     }
 
     let unit = format!(
         r#"[Unit]
-Description=Redial IP Bot
+Description=Boil IP Bot
 After=network.target
 
 [Service]

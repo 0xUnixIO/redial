@@ -109,8 +109,8 @@ pub async fn cmd_change(config: &Config) -> anyhow::Result<()> {
 pub fn cmd_timer(config: &Config, arg: &str) -> anyhow::Result<()> {
     if arg.is_empty() {
         match &config.change_cron {
-            Some(cron) => println!("⏰ 当前定时换 IP: {cron}\n\n关闭: redial timer off"),
-            None => println!("⏰ 定时换 IP 未启用\n\n设置示例:\n  每6小时: redial timer \"0 */6 * * *\"\n  每天3点: redial timer \"0 3 * * *\""),
+            Some(cron) => println!("⏰ 当前定时换 IP: {cron}\n\n关闭: boil timer off"),
+            None => println!("⏰ 定时换 IP 未启用\n\n设置示例:\n  每6小时: boil timer \"0 */6 * * *\"\n  每天3点: boil timer \"0 3 * * *\""),
         }
         return Ok(());
     }
@@ -123,6 +123,6 @@ pub fn cmd_timer(config: &Config, arg: &str) -> anyhow::Result<()> {
 
     validate_cron(arg)?;
     save_cron(Some(arg))?;
-    println!("✅ 定时换 IP 已设置: {arg}\n重启 redial 后生效");
+    println!("✅ 定时换 IP 已设置: {arg}\n重启 boil 后生效");
     Ok(())
 }

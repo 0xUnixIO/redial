@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# redial 一键安装脚本
-# 用法: curl -fsSL https://raw.githubusercontent.com/0xUnixIO/redial/main/install.sh | bash
+# boil 一键安装脚本
+# 用法: curl -fsSL https://raw.githubusercontent.com/0xUnixIO/boil/main/install.sh | bash
 
 set -euo pipefail
 
-REPO="0xUnixIO/redial"
-BIN_NAME="redial"
+REPO="0xUnixIO/boil"
+BIN_NAME="boil"
 INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
 
 OS="$(uname -s)"
@@ -14,8 +14,8 @@ ARCH="$(uname -m)"
 case "$OS" in
   Linux)
     case "$ARCH" in
-      x86_64)        ARTIFACT="redial-linux-x86_64" ;;
-      aarch64|arm64) ARTIFACT="redial-linux-aarch64" ;;
+      x86_64)        ARTIFACT="boil-linux-x86_64" ;;
+      aarch64|arm64) ARTIFACT="boil-linux-aarch64" ;;
       *) echo "不支持的架构: $ARCH" >&2; exit 1 ;;
     esac
     ;;
@@ -50,7 +50,7 @@ echo "✅ 安装完成: $INSTALL_DIR/$BIN_NAME"
 echo ""
 
 # 已有配置则跳过向导，仅首次安装时运行
-if [ ! -f "/etc/redial/config.env" ] && [ ! -f "$INSTALL_DIR/config.env" ]; then
+if [ ! -f "/etc/boil/config.env" ] && [ ! -f "$INSTALL_DIR/config.env" ]; then
   "$INSTALL_DIR/$BIN_NAME" setup
 else
   echo "检测到已有配置，跳过配置向导"
@@ -59,8 +59,8 @@ fi
 # 安装 systemd 服务（已安装则重启以加载新版本）
 if command -v systemctl >/dev/null 2>&1; then
   echo ""
-  if systemctl is-active --quiet redial 2>/dev/null; then
-    systemctl restart redial
+  if systemctl is-active --quiet boil 2>/dev/null; then
+    systemctl restart boil
     echo "✅ 服务已重启（新版本生效）"
   else
     "$INSTALL_DIR/$BIN_NAME" service install

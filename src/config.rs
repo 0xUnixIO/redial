@@ -109,7 +109,7 @@ pub async fn run_setup_wizard() -> anyhow::Result<()> {
     // TG 可选
     let want_tg = Select::new()
         .with_prompt("配置 Telegram Bot（用于远程控制）")
-        .items(&["是，现在配置", "否，跳过（之后可用 redial setup 补充）"])
+        .items(&["是，现在配置", "否，跳过（之后可用 boil setup 补充）"])
         .default(0)
         .interact()? == 0;
 
@@ -127,7 +127,7 @@ pub async fn run_setup_wizard() -> anyhow::Result<()> {
         println!("✅ 检测到 chat_id: {chat_id}\n");
         (Some(token), Some(chat_id))
     } else {
-        println!("已跳过 Telegram 配置，可使用 redial status/change 命令行操作\n");
+        println!("已跳过 Telegram 配置，可使用 boil status/change 命令行操作\n");
         (None, None)
     };
 
@@ -143,9 +143,9 @@ pub async fn run_setup_wizard() -> anyhow::Result<()> {
     std::fs::write("config.env", content)?;
     println!("✅ 配置已保存到 config.env\n");
     println!("常用命令:");
-    println!("  redial status    查看当前 IP");
-    println!("  redial check     检查 IP 质量和流媒体解锁");
-    println!("  redial change    换 IP");
+    println!("  boil status    查看当前 IP");
+    println!("  boil check     检查 IP 质量和流媒体解锁");
+    println!("  boil change    换 IP");
     println!();
     Ok(())
 }

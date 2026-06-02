@@ -44,7 +44,7 @@ impl QueryAllResponse {
 
 fn cookie_path() -> PathBuf {
     // 与 config.env 放在同一目录
-    for dir in ["/etc/redial", "."] {
+    for dir in ["/etc/boil", "."] {
         let p = PathBuf::from(dir);
         if p.exists() {
             return p.join("session.cookie");

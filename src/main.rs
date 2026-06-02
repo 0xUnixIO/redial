@@ -10,7 +10,7 @@ mod timer;
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
-#[command(name = "redial", about = "Boil.network 换 IP 工具", version)]
+#[command(name = "boil", about = "Boil.network 换 IP 工具", version)]
 struct Cli {
     #[command(subcommand)]
     command: Option<Commands>,
@@ -28,7 +28,7 @@ enum Commands {
     Bot,
     /// 重新运行配置向导
     Setup,
-    /// 定时换 IP 设置，如: redial timer "0 */6 * * *" 或 redial timer off
+    /// 定时换 IP 设置，如: boil timer "0 */6 * * *" 或 boil timer off
     Timer {
         /// cron 表达式（5字段）或 "off"，留空查看当前设置
         expr: Option<String>,
@@ -62,11 +62,11 @@ async fn main() -> anyhow::Result<()> {
                 bot::run(config).await?;
             } else {
                 println!("提示: 未配置 Telegram，可直接使用以下命令：");
-                println!("  redial status        查看当前 IP");
-                println!("  redial check         检查 IP 质量");
-                println!("  redial change        换 IP");
-                println!("  redial timer         查看/设置定时换 IP");
-                println!("  redial setup         重新配置（含 TG）");
+                println!("  boil status        查看当前 IP");
+                println!("  boil check         检查 IP 质量");
+                println!("  boil change        换 IP");
+                println!("  boil timer         查看/设置定时换 IP");
+                println!("  boil setup         重新配置（含 TG）");
             }
         }
         Some(Commands::Status) => {

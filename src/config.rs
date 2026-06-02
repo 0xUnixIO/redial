@@ -97,7 +97,7 @@ pub async fn run_setup_wizard() -> anyhow::Result<()> {
         .await
         .context("登录失败，请检查账号密码")?;
 
-    let data = client.query_all().await?;
+    let data = client.query_all_authed(&account, &password).await?;
     println!("✅ 登录成功，找到以下服务器：\n");
     for item in &data.zone_items {
         let ip = data.get_ip(&item.router_id, &item.interface).unwrap_or("未知");

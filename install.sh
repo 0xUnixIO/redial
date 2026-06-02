@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # redial 一键安装脚本
-# 用法: curl -fsSL https://raw.githubusercontent.com/zzfn/server/main/install.sh | bash
+# 用法: curl -fsSL https://raw.githubusercontent.com/0xUnixIO/redial/main/install.sh | bash
 
 set -euo pipefail
 
-REPO="zzfn/server"
+REPO="0xUnixIO/redial"
 BIN_NAME="redial"
 INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
 

@@ -37,7 +37,8 @@ pub async fn cmd_check(config: &Config) -> anyhow::Result<()> {
     }
 
     // 流媒体检测需要从 Boil VPS 的 IP 发出，先对比本机公网 IP
-    let boil_ips: Vec<String> = data.changeable()
+    // 用全部服务器（含 NAT 不可换）的 IP 比对，否则本机若是 NAT 机会被误判
+    let boil_ips: Vec<String> = data.zone_items
         .iter()
         .filter_map(|r| data.get_ip(&r.router_id, &r.interface))
         .map(str::to_string)
@@ -61,16 +62,19 @@ pub async fn cmd_check(config: &Config) -> anyhow::Result<()> {
 }
 
 async fn get_local_public_ip() -> Option<String> {
-    reqwest::Client::new()
-        .get("https://api.ipify.org")
-        .timeout(std::time::Duration::from_secs(5))
-        .send()
-        .await
-        .ok()?
-        .text()
-        .await
-        .ok()
-        .map(|s| s.trim().to_string())
+    let client = reqwest::Client::new();
+    // 多源兜底：单一服务超时/被墙时仍能拿到本机公网 IP，避免误判为非 VPS
+    for url in ["https://api.ipify.org", "https://ifconfig.me/ip", "https://icanhazip.com"] {
+        if let Ok(resp) = client.get(url).timeout(std::time::Duration::from_secs(5)).send().await {
+            if let Ok(text) = resp.text().await {
+                let ip = text.trim().to_string();
+                if !ip.is_empty() {
+                    return Some(ip);
+                }
+            }
+        }
+    }
+    None
 }
 
 pub async fn cmd_change(config: &Config) -> anyhow::Result<()> {

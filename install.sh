@@ -14,20 +14,13 @@ ARCH="$(uname -m)"
 case "$OS" in
   Linux)
     case "$ARCH" in
-      x86_64)  ARTIFACT="redial-linux-x86_64" ;;
+      x86_64)        ARTIFACT="redial-linux-x86_64" ;;
       aarch64|arm64) ARTIFACT="redial-linux-aarch64" ;;
       *) echo "不支持的架构: $ARCH" >&2; exit 1 ;;
     esac
     ;;
-  Darwin)
-    case "$ARCH" in
-      x86_64) ARTIFACT="redial-macos-x86_64" ;;
-      arm64)  ARTIFACT="redial-macos-aarch64" ;;
-      *) echo "不支持的架构: $ARCH" >&2; exit 1 ;;
-    esac
-    ;;
   *)
-    echo "不支持的系统: $OS" >&2; exit 1 ;;
+    echo "仅支持 Linux 系统" >&2; exit 1 ;;
 esac
 
 echo "获取最新版本..."
